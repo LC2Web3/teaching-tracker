@@ -125,10 +125,10 @@ button{font-family:inherit}
 <div style="font-size:48px;margin-bottom:8px">📋</div>
 <h2 style="margin-bottom:4px">网安学院 · 工作追踪</h2>
 <p style="color:#888;font-size:13px;margin-bottom:20px">26春季学期 · 请选择身份</p>
-<button class="login-btn" onclick="selRole(this,'副院长')">🟣 副院长（我）</button>
-<button class="login-btn" onclick="selRole(this,'王老师')">🔵 王老师</button>
-<button class="login-btn" onclick="selRole(this,'董老师')">🟢 董老师</button>
-<button class="login-btn" onclick="selRole(this,'李老师')">🟠 李老师</button>
+<button class="login-btn" onclick="selRole(this,'李  超')">🟣 李  超</button>
+<button class="login-btn" onclick="selRole(this,'王德芳')">🔵 王德芳</button>
+<button class="login-btn" onclick="selRole(this,'李巍巍')">🟠 李巍巍</button>
+<button class="login-btn" onclick="selRole(this,'董晓娜')">🟢 董晓娜</button>
 <div style="margin-top:16px">
 <input type="password" id="pinInput" placeholder="输入访问密码" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:14px;text-align:center" onkeydown="if(event.key==='Enter')doLogin()">
 </div>
@@ -141,8 +141,8 @@ button{font-family:inherit}
 <div id="mainApp" style="display:none">
 <div class="header">
 <div>
-<h1>📋 网安学院 · 26年春季学期工作追踪</h1>
-<div class="sub">教学副院长 · 管理看板 &nbsp;<span id="syncStatus" style="font-size:11px">⏳ 连接中...</span></div>
+<h1>📋 网安学院 · 26年春季学期人才培养工作追踪</h1>
+<div class="sub">管理看板 &nbsp;<span id="syncStatus" style="font-size:11px">⏳ 连接中...</span></div>
 </div>
 <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
 <span id="userBadge" style="padding:4px 12px;border-radius:12px;font-size:12px;background:rgba(255,255,255,.2)"></span>
@@ -163,10 +163,10 @@ button{font-family:inherit}
 <div class="toolbar">
 <label style="font-size:13px;color:var(--text2)">负责人：</label>
 <button class="fbtn active" onclick="setOwner('all',this)">全部</button>
-<button class="fbtn" onclick="setOwner('王老师',this)">🔵王</button>
-<button class="fbtn" onclick="setOwner('董老师',this)">🟢董</button>
-<button class="fbtn" onclick="setOwner('李老师',this)">🟠李</button>
-<button class="fbtn" onclick="setOwner('副院长',this)">🟣我</button>
+<button class="fbtn" onclick="setOwner('李  超',this)">🟣超</button>
+<button class="fbtn" onclick="setOwner('王德芳',this)">🔵芳</button>
+<button class="fbtn" onclick="setOwner('董晓娜',this)">🟢娜</button>
+<button class="fbtn" onclick="setOwner('李巍巍',this)">🟠巍</button>
 <select id="fMonth" onchange="render()"><option value="all">全部月份</option><option value="2">2月</option><option value="3">3月</option><option value="4">4月</option><option value="5">5月</option><option value="6">6月</option><option value="7">7月</option><option value="0">贯穿学期</option></select>
 <select id="fStatus" onchange="render()"><option value="all">全部状态</option><option value="todo">待启动</option><option value="doing">进行中</option><option value="done">已完成</option></select>
 <input type="text" id="fSearch" placeholder="🔍 搜索任务..." oninput="render()">
@@ -186,7 +186,7 @@ button{font-family:inherit}
 <input type="hidden" id="eId">
 <div class="fg"><label>任务名称 *</label><input id="eName" placeholder="任务名称"></div>
 <div class="frow">
-<div class="fg"><label>负责人</label><select id="eOwner"><option value="王老师">🔵 王老师</option><option value="董老师">🟢 董老师</option><option value="李老师">🟠 李老师</option><option value="副院长">🟣 副院长</option></select></div>
+<div class="fg"><label>负责人</label><select id="eOwner"><option value="王德芳">🔵 王德芳</option><option value="董晓娜">🟢 董晓娜</option><option value="李巍巍">🟠 李巍巍</option><option value="李  超">🟣 李  超</option></select></div>
 <div class="fg"><label>月份</label><select id="eMonth"><option value="2">2月</option><option value="3">3月</option><option value="4">4月</option><option value="5">5月</option><option value="6">6月</option><option value="7">7月</option><option value="0">贯穿学期</option></select></div>
 </div>
 <div class="frow">
@@ -239,101 +239,101 @@ var firebaseConfig = {
 };
 
 // ⚠️ 第2处可改：访问密码（告诉四个人即可）
-var ACCESS_PIN = "bmxyrcb";
+var ACCESS_PIN = "waxyrcb";
 
 // ===== 91项预设任务 =====
 var TASKS=[
-{id:1,name:"研究生老生注册、报到、退学处理、学业警示",owner:"王老师",month:"2",deadline:"2026-03-09",status:"todo",priority:"high",dept:"研究生院",note:"3月9日前报给研究生院",notes:[]},
-{id:2,name:"本科/研究生注册率统计",owner:"董老师",month:"2",deadline:"2026-03-07",status:"todo",priority:"high",dept:"教学运行中心",note:"管理岗发劳务，安排学生协助",notes:[]},
-{id:3,name:"本科退补选",owner:"董老师",month:"2",deadline:"2026-03-07",status:"todo",priority:"high",dept:"教学运行中心",note:"",notes:[]},
-{id:4,name:"上学期教学资料归档",owner:"董老师",month:"2",deadline:"2026-03-15",status:"todo",priority:"medium",dept:"教学运行中心",note:"",notes:[]},
-{id:5,name:"本学期教学资料检查（开课提醒/主讲确认/助课/资料上传）",owner:"董老师",month:"2",deadline:"2026-03-07",status:"todo",priority:"high",dept:"教学运行中心",note:"",notes:[]},
-{id:6,name:"★ 开学第一节课检查（周一）",owner:"副院长",month:"2",deadline:"2026-03-02",status:"todo",priority:"high",dept:"",note:"副院长亲自到场检查",notes:[]},
-{id:7,name:"上学期补考安排",owner:"董老师",month:"2",deadline:"2026-03-14",status:"todo",priority:"medium",dept:"教学运行中心",note:"提醒教师不要缺勤",notes:[]},
-{id:8,name:"休学审批",owner:"董老师",month:"2",deadline:"",status:"todo",priority:"medium",dept:"本科教学服务平台",note:"MIS→11号平台→教务系统；需副院长签字",notes:[]},
-{id:9,name:"学业预警流程",owner:"董老师",month:"2",deadline:"2026-03-15",status:"todo",priority:"high",dept:"",note:"董老师+辅导员协作，副院长签字",notes:[]},
-{id:10,name:"研究生复试成绩公布与划线",owner:"王老师",month:"2",deadline:"2026-03-06",status:"todo",priority:"high",dept:"研究生院",note:"2月末出成绩，研究生院先画线后与学院沟通",notes:[]},
-{id:11,name:"教改项目评审准备（3/2预审）",owner:"李老师",month:"2",deadline:"2026-03-02",status:"todo",priority:"high",dept:"本科生院",note:"3/2先看材料，3/11正式评审排序",notes:[]},
-{id:12,name:"国家教学名师申报",owner:"董老师",month:"2",deadline:"2026-03-31",status:"todo",priority:"medium",dept:"教师发展中心",note:"",notes:[]},
-{id:13,name:"优秀主讲教师（优主）评选",owner:"董老师",month:"2",deadline:"2026-03-31",status:"todo",priority:"medium",dept:"教学运行中心",note:"",notes:[]},
-{id:14,name:"大类课程上课问题协调（彭老师、大林老师）",owner:"董老师",month:"2",deadline:"2026-03-07",status:"todo",priority:"high",dept:"教学运行中心",note:"涉及大类的两门课",notes:[]},
-{id:15,name:"新教师安排（马昊玉）",owner:"董老师",month:"2",deadline:"2026-03-15",status:"todo",priority:"medium",dept:"教师发展中心",note:"新入职教师教学安排与指导",notes:[]},
-{id:16,name:"★ 研究生复试全流程（工作办法/命题/面试/资格审核）",owner:"王老师",month:"3",deadline:"2026-03-20",status:"todo",priority:"high",dept:"研究生院",note:"笔试命题；面试题库；资格审核",notes:[]},
-{id:17,name:"★ 向院长汇报复试工作",owner:"副院长",month:"3",deadline:"2026-03-06",status:"todo",priority:"high",dept:"院领导",note:"确定成绩，准备招生录取办法与命题方案",notes:[]},
-{id:18,name:"查看生源数据，落实招生指标",owner:"王老师",month:"3",deadline:"2026-03-15",status:"todo",priority:"high",dept:"研究生院",note:"根据生源质量调整招生策略",notes:[]},
-{id:19,name:"导师博士/硕士研究生指标分配说明",owner:"王老师",month:"3",deadline:"2026-03-31",status:"todo",priority:"high",dept:"研究生院",note:"推免/统招、专硕/学硕、专项不限制",notes:[]},
-{id:20,name:"博士招生（定向）—科研经费/缴费/录取",owner:"王老师",month:"3",deadline:"2026-03-31",status:"todo",priority:"high",dept:"研究生院",note:"校内校外科研经费审核，缴费确认",notes:[]},
-{id:21,name:"博士补充招生（新增指标）",owner:"王老师",month:"3",deadline:"2026-03-31",status:"todo",priority:"medium",dept:"研究生院",note:"3月中下旬新增指标后再来一次",notes:[]},
-{id:22,name:"博士学位论文送审（8-10人）",owner:"王老师",month:"3",deadline:"2026-03-31",status:"todo",priority:"high",dept:"研究生院",note:"送审周期约一个月",notes:[]},
-{id:23,name:"研究生教育教学改革研究项目检查",owner:"王老师",month:"3",deadline:"2026-03-31",status:"todo",priority:"medium",dept:"研究生院",note:"",notes:[]},
-{id:24,name:"核实科研当量",owner:"王老师",month:"3",deadline:"2026-03-31",status:"todo",priority:"medium",dept:"研究生院",note:"",notes:[]},
-{id:25,name:"产学研创新基金",owner:"王老师",month:"3",deadline:"2026-03-31",status:"todo",priority:"medium",dept:"研究生院",note:"王老师和李老师均涉及",notes:[]},
-{id:26,name:"教学院长例会",owner:"董老师",month:"3",deadline:"",status:"todo",priority:"medium",dept:"学校",note:"副院长出席",notes:[]},
-{id:27,name:"督导计划执行与报告",owner:"董老师",month:"3",deadline:"2026-03-31",status:"todo",priority:"medium",dept:"教师发展中心",note:"签字后上交",notes:[]},
-{id:28,name:"青年教师研修班",owner:"董老师",month:"3",deadline:"2026-03-31",status:"todo",priority:"medium",dept:"教师发展中心",note:"",notes:[]},
-{id:29,name:"教学创新能力大赛",owner:"董老师",month:"3",deadline:"2026-03-31",status:"todo",priority:"medium",dept:"教师发展中心",note:"",notes:[]},
-{id:30,name:"学期初听课安排",owner:"董老师",month:"3",deadline:"2026-03-31",status:"todo",priority:"medium",dept:"教学运行中心",note:"",notes:[]},
-{id:31,name:"春季学期成绩录入（补录/更正）",owner:"董老师",month:"3",deadline:"2026-03-31",status:"todo",priority:"medium",dept:"教学运行中心",note:"",notes:[]},
-{id:32,name:"★ 教改项目评审排序（3月11日）",owner:"李老师",month:"3",deadline:"2026-03-11",status:"todo",priority:"high",dept:"本科生院",note:"组织评审并形成报告",notes:[]},
-{id:33,name:"产学研创新基金（本科）",owner:"李老师",month:"3",deadline:"2026-03-31",status:"todo",priority:"medium",dept:"本科生院",note:"",notes:[]},
-{id:34,name:"国家智慧教育平台课程资源遴选",owner:"李老师",month:"3",deadline:"2026-03-31",status:"todo",priority:"medium",dept:"本科生院",note:"",notes:[]},
-{id:35,name:"本科毕业设计中期检查",owner:"李老师",month:"3",deadline:"2026-03-31",status:"todo",priority:"medium",dept:"本科生院",note:"",notes:[]},
-{id:36,name:"学业预警签字",owner:"副院长",month:"3",deadline:"2026-03-15",status:"todo",priority:"high",dept:"",note:"配合董老师+辅导员",notes:[]},
-{id:37,name:"非全调剂工作（全日制→非全）",owner:"王老师",month:"4",deadline:"2026-04-30",status:"todo",priority:"high",dept:"研究生院",note:"需工作办法、笔试、面试",notes:[]},
-{id:38,name:"导师当量核算与录取学生确认",owner:"王老师",month:"4",deadline:"2026-04-30",status:"todo",priority:"medium",dept:"研究生院",note:"",notes:[]},
-{id:39,name:"博士预答辩",owner:"王老师",month:"4",deadline:"2026-04-30",status:"todo",priority:"high",dept:"研究生院",note:"3月送审论文返回后组织",notes:[]},
-{id:40,name:"研究生教育教学改革项目申报",owner:"王老师",month:"4",deadline:"2026-04-30",status:"todo",priority:"medium",dept:"研究生院",note:"",notes:[]},
-{id:41,name:"夏季研究生学位论文答辩安排",owner:"王老师",month:"4",deadline:"2026-04-30",status:"todo",priority:"medium",dept:"研究生院",note:"",notes:[]},
-{id:42,name:"博士生补充招生意向征集",owner:"王老师",month:"4",deadline:"2026-04-30",status:"todo",priority:"medium",dept:"研究生院",note:"",notes:[]},
-{id:43,name:"新生入学档案整理",owner:"王老师",month:"4",deadline:"2026-04-30",status:"todo",priority:"medium",dept:"档案馆",note:"找学生协助",notes:[]},
-{id:44,name:"两年制硕士提前毕业准备",owner:"王老师",month:"4",deadline:"2026-04-30",status:"todo",priority:"medium",dept:"研究生院",note:"",notes:[]},
-{id:45,name:"ISW培训班",owner:"董老师",month:"4",deadline:"2026-04-30",status:"todo",priority:"medium",dept:"教师发展中心",note:"",notes:[]},
-{id:46,name:"本科毕业设计检查",owner:"董老师",month:"4",deadline:"2026-04-30",status:"todo",priority:"medium",dept:"教学运行中心",note:"",notes:[]},
-{id:47,name:"取消考试资格处理",owner:"董老师",month:"4",deadline:"2026-04-30",status:"todo",priority:"medium",dept:"教学运行中心",note:"",notes:[]},
-{id:48,name:"教师发展计划（关联KPI）",owner:"董老师",month:"4",deadline:"2026-04-30",status:"todo",priority:"medium",dept:"教师发展中心",note:"",notes:[]},
-{id:49,name:"本科生转专业和大类专业分流",owner:"李老师",month:"4",deadline:"2026-04-30",status:"todo",priority:"medium",dept:"本科生院",note:"",notes:[]},
-{id:50,name:"本科毕设中期检查反馈及后续",owner:"李老师",month:"4",deadline:"2026-04-30",status:"todo",priority:"medium",dept:"本科生院",note:"",notes:[]},
-{id:51,name:"教学建设与改革项目立项",owner:"李老师",month:"4",deadline:"2026-04-30",status:"todo",priority:"medium",dept:"本科生院",note:"",notes:[]},
-{id:52,name:"培养方案修订（大类）、小学期、下学期规划",owner:"李老师",month:"4",deadline:"2026-04-30",status:"todo",priority:"medium",dept:"本科生院",note:"",notes:[]},
-{id:53,name:"双学位相关工作",owner:"李老师",month:"4",deadline:"2026-04-30",status:"todo",priority:"low",dept:"本科生院",note:"",notes:[]},
-{id:54,name:"夏季博士学位论文答辩",owner:"王老师",month:"5",deadline:"2026-05-31",status:"todo",priority:"high",dept:"研究生院",note:"",notes:[]},
-{id:55,name:"硕士学位论文送审与答辩",owner:"王老师",month:"5",deadline:"2026-05-31",status:"todo",priority:"high",dept:"研究生院",note:"学位会在5月底",notes:[]},
-{id:56,name:"夏季硕士研究生答辩",owner:"王老师",month:"5",deadline:"2026-05-31",status:"todo",priority:"medium",dept:"研究生院",note:"",notes:[]},
-{id:57,name:"本科生招生准备",owner:"王老师",month:"5",deadline:"2026-05-31",status:"todo",priority:"medium",dept:"招生办",note:"5-6月集中",notes:[]},
-{id:58,name:"秋季教学计划编排",owner:"董老师",month:"5",deadline:"2026-05-31",status:"todo",priority:"medium",dept:"教学运行中心",note:"",notes:[]},
-{id:59,name:"期末考试准备工作",owner:"董老师",month:"5",deadline:"2026-05-31",status:"todo",priority:"medium",dept:"教学运行中心",note:"",notes:[]},
-{id:60,name:"校级教学建设与改革项目结题/中期检查",owner:"李老师",month:"5",deadline:"2026-05-31",status:"todo",priority:"medium",dept:"本科生院",note:"",notes:[]},
-{id:61,name:"本科毕业论文评阅",owner:"李老师",month:"5",deadline:"2026-05-31",status:"todo",priority:"medium",dept:"本科生院",note:"",notes:[]},
-{id:62,name:"本科毕业设计（论文）答辩",owner:"李老师",month:"5",deadline:"2026-05-31",status:"todo",priority:"high",dept:"本科生院",note:"",notes:[]},
-{id:63,name:"博士学位会（6月毕业）",owner:"王老师",month:"6",deadline:"2026-06-30",status:"todo",priority:"high",dept:"研究生院",note:"",notes:[]},
-{id:64,name:"研究生教材选用计划填报",owner:"王老师",month:"6",deadline:"2026-06-30",status:"todo",priority:"medium",dept:"研究生院",note:"",notes:[]},
-{id:65,name:"★ 本科生招生（大区）",owner:"王老师",month:"6",deadline:"2026-06-30",status:"todo",priority:"high",dept:"招生办",note:"集中招生期",notes:[]},
-{id:66,name:"毕业老生科技档案存档",owner:"王老师",month:"6",deadline:"2026-06-30",status:"todo",priority:"medium",dept:"档案馆",note:"",notes:[]},
-{id:67,name:"大学英语四六级考试",owner:"董老师",month:"6",deadline:"2026-06-20",status:"todo",priority:"medium",dept:"教学运行中心",note:"",notes:[]},
-{id:68,name:"夏季小学期安排",owner:"董老师",month:"6",deadline:"2026-06-30",status:"todo",priority:"medium",dept:"教学运行中心",note:"",notes:[]},
-{id:69,name:"统计代表性教材",owner:"李老师",month:"6",deadline:"2026-06-30",status:"todo",priority:"medium",dept:"本科生院",note:"",notes:[]},
-{id:70,name:"教育部课程教材研究项目申报",owner:"李老师",month:"6",deadline:"2026-06-30",status:"todo",priority:"medium",dept:"本科生院",note:"",notes:[]},
-{id:71,name:"本科毕设材料整改",owner:"李老师",month:"6",deadline:"2026-06-30",status:"todo",priority:"medium",dept:"本科生院",note:"",notes:[]},
-{id:72,name:"校级优秀本科毕业设计评选",owner:"李老师",month:"6",deadline:"2026-06-30",status:"todo",priority:"medium",dept:"本科生院",note:"",notes:[]},
-{id:73,name:"本科教学研究与改革论文集",owner:"李老师",month:"6",deadline:"2026-06-30",status:"todo",priority:"medium",dept:"本科生院",note:"",notes:[]},
-{id:74,name:"北京市教学成果奖",owner:"王老师",month:"7",deadline:"2026-07-31",status:"todo",priority:"medium",dept:"研究生院",note:"",notes:[]},
-{id:75,name:"大学生创新创业训练计划项目",owner:"王老师",month:"7",deadline:"2026-07-31",status:"todo",priority:"medium",dept:"研究生院",note:"",notes:[]},
-{id:76,name:"春季学期教学材料归档",owner:"董老师",month:"7",deadline:"2026-07-31",status:"todo",priority:"medium",dept:"教学运行中心",note:"",notes:[]},
-{id:77,name:"全国教材建设奖校内遴选推荐",owner:"李老师",month:"7",deadline:"2026-07-31",status:"todo",priority:"medium",dept:"本科生院",note:"",notes:[]},
-{id:78,name:"本科培养方案、课程大纲修订",owner:"李老师",month:"7",deadline:"2026-07-31",status:"todo",priority:"medium",dept:"本科生院",note:"",notes:[]},
-{id:79,name:"中华文化多语种数字化精品课程申报",owner:"李老师",month:"7",deadline:"2026-07-31",status:"todo",priority:"low",dept:"本科生院",note:"",notes:[]},
-{id:80,name:"《轮流评审》制度建设",owner:"王老师",month:"0",deadline:"",status:"todo",priority:"medium",dept:"",note:"新事项，需建立机制",notes:[]},
-{id:81,name:"《信息化系统》建设",owner:"王老师",month:"0",deadline:"",status:"todo",priority:"medium",dept:"",note:"需持续推进",notes:[]},
-{id:82,name:"值班表编排",owner:"王老师",month:"0",deadline:"2026-03-07",status:"todo",priority:"medium",dept:"",note:"学期初制定",notes:[]},
-{id:83,name:"人员扩充（加人）",owner:"王老师",month:"0",deadline:"",status:"todo",priority:"medium",dept:"",note:"人手不足",notes:[]},
-{id:84,name:"教学院长例会（持续）",owner:"董老师",month:"0",deadline:"",status:"todo",priority:"medium",dept:"学校",note:"副院长出席",notes:[]},
-{id:85,name:"督导听课与报告（持续）",owner:"董老师",month:"0",deadline:"",status:"todo",priority:"medium",dept:"教师发展中心",note:"按督导计划执行",notes:[]},
-{id:86,name:"教师发展中心相关工作（持续）",owner:"董老师",month:"0",deadline:"",status:"todo",priority:"medium",dept:"教师发展中心",note:"含名师、创新大赛等",notes:[]},
-{id:87,name:"优秀教师推荐上党政联席会",owner:"董老师",month:"0",deadline:"",status:"todo",priority:"medium",dept:"",note:"书记提出",notes:[]},
-{id:88,name:"经费管理",owner:"李老师",month:"0",deadline:"",status:"todo",priority:"medium",dept:"",note:"贯穿全学期",notes:[]},
-{id:89,name:"大创/竞赛管理",owner:"李老师",month:"0",deadline:"",status:"todo",priority:"medium",dept:"",note:"王健、段莉、彭双和、张焘等",notes:[]},
-{id:90,name:"双学位工作（持续）",owner:"李老师",month:"0",deadline:"",status:"todo",priority:"low",dept:"本科生院",note:"",notes:[]},
-{id:91,name:"培养方案（大类）修订（持续）",owner:"李老师",month:"0",deadline:"",status:"todo",priority:"medium",dept:"本科生院",note:"含小学期、下学期课程规划",notes:[]}
+{id:1,name:"研究生老生注册、报到、退学处理、学业警示",owner:"王德芳",month:"2",deadline:"2026-03-09",status:"todo",priority:"high",dept:"研究生院",note:"3月9日前报给研究生院",notes:[]},
+{id:2,name:"本科/研究生注册率统计",owner:"董晓娜",month:"2",deadline:"2026-03-07",status:"todo",priority:"high",dept:"教学运行中心",note:"管理岗发劳务，安排学生协助",notes:[]},
+{id:3,name:"本科退补选",owner:"董晓娜",month:"2",deadline:"2026-03-07",status:"todo",priority:"high",dept:"教学运行中心",note:"",notes:[]},
+{id:4,name:"上学期教学资料归档",owner:"董晓娜",month:"2",deadline:"2026-03-15",status:"todo",priority:"medium",dept:"教学运行中心",note:"",notes:[]},
+{id:5,name:"本学期教学资料检查（开课提醒/主讲确认/助课/资料上传）",owner:"董晓娜",month:"2",deadline:"2026-03-07",status:"todo",priority:"high",dept:"教学运行中心",note:"",notes:[]},
+{id:6,name:"★ 开学第一节课检查（周一）",owner:"李  超",month:"2",deadline:"2026-03-02",status:"todo",priority:"high",dept:"",note:"李  超亲自到场检查",notes:[]},
+{id:7,name:"上学期补考安排",owner:"董晓娜",month:"2",deadline:"2026-03-14",status:"todo",priority:"medium",dept:"教学运行中心",note:"提醒教师不要缺勤",notes:[]},
+{id:8,name:"休学审批",owner:"董晓娜",month:"2",deadline:"",status:"todo",priority:"medium",dept:"本科教学服务平台",note:"MIS→11号平台→教务系统；需李  超签字",notes:[]},
+{id:9,name:"学业预警流程",owner:"董晓娜",month:"2",deadline:"2026-03-15",status:"todo",priority:"high",dept:"",note:"董晓娜+辅导员协作，李  超签字",notes:[]},
+{id:10,name:"研究生复试成绩公布与划线",owner:"王德芳",month:"2",deadline:"2026-03-06",status:"todo",priority:"high",dept:"研究生院",note:"2月末出成绩，研究生院先画线后与学院沟通",notes:[]},
+{id:11,name:"教改项目评审准备（3/2预审）",owner:"李巍巍",month:"2",deadline:"2026-03-02",status:"todo",priority:"high",dept:"本科生院",note:"3/2先看材料，3/11正式评审排序",notes:[]},
+{id:12,name:"国家教学名师申报",owner:"董晓娜",month:"2",deadline:"2026-03-31",status:"todo",priority:"medium",dept:"教师发展中心",note:"",notes:[]},
+{id:13,name:"优秀主讲教师（优主）评选",owner:"董晓娜",month:"2",deadline:"2026-03-31",status:"todo",priority:"medium",dept:"教学运行中心",note:"",notes:[]},
+{id:14,name:"大类课程上课问题协调（彭老师、大林老师）",owner:"董晓娜",month:"2",deadline:"2026-03-07",status:"todo",priority:"high",dept:"教学运行中心",note:"涉及大类的两门课",notes:[]},
+{id:15,name:"新教师安排（马昊玉）",owner:"董晓娜",month:"2",deadline:"2026-03-15",status:"todo",priority:"medium",dept:"教师发展中心",note:"新入职教师教学安排与指导",notes:[]},
+{id:16,name:"★ 研究生复试全流程（工作办法/命题/面试/资格审核）",owner:"王德芳",month:"3",deadline:"2026-03-20",status:"todo",priority:"high",dept:"研究生院",note:"笔试命题；面试题库；资格审核",notes:[]},
+{id:17,name:"★ 向院长汇报复试工作",owner:"李  超",month:"3",deadline:"2026-03-06",status:"todo",priority:"high",dept:"院领导",note:"确定成绩，准备招生录取办法与命题方案",notes:[]},
+{id:18,name:"查看生源数据，落实招生指标",owner:"王德芳",month:"3",deadline:"2026-03-15",status:"todo",priority:"high",dept:"研究生院",note:"根据生源质量调整招生策略",notes:[]},
+{id:19,name:"导师博士/硕士研究生指标分配说明",owner:"王德芳",month:"3",deadline:"2026-03-31",status:"todo",priority:"high",dept:"研究生院",note:"推免/统招、专硕/学硕、专项不限制",notes:[]},
+{id:20,name:"博士招生（定向）—科研经费/缴费/录取",owner:"王德芳",month:"3",deadline:"2026-03-31",status:"todo",priority:"high",dept:"研究生院",note:"校内校外科研经费审核，缴费确认",notes:[]},
+{id:21,name:"博士补充招生（新增指标）",owner:"王德芳",month:"3",deadline:"2026-03-31",status:"todo",priority:"medium",dept:"研究生院",note:"3月中下旬新增指标后再来一次",notes:[]},
+{id:22,name:"博士学位论文送审（8-10人）",owner:"王德芳",month:"3",deadline:"2026-03-31",status:"todo",priority:"high",dept:"研究生院",note:"送审周期约一个月",notes:[]},
+{id:23,name:"研究生教育教学改革研究项目检查",owner:"王德芳",month:"3",deadline:"2026-03-31",status:"todo",priority:"medium",dept:"研究生院",note:"",notes:[]},
+{id:24,name:"核实科研当量",owner:"王德芳",month:"3",deadline:"2026-03-31",status:"todo",priority:"medium",dept:"研究生院",note:"",notes:[]},
+{id:25,name:"产学研创新基金",owner:"王德芳",month:"3",deadline:"2026-03-31",status:"todo",priority:"medium",dept:"研究生院",note:"王德芳和李巍巍均涉及",notes:[]},
+{id:26,name:"教学院长例会",owner:"董晓娜",month:"3",deadline:"",status:"todo",priority:"medium",dept:"学校",note:"李  超出席",notes:[]},
+{id:27,name:"督导计划执行与报告",owner:"董晓娜",month:"3",deadline:"2026-03-31",status:"todo",priority:"medium",dept:"教师发展中心",note:"签字后上交",notes:[]},
+{id:28,name:"青年教师研修班",owner:"董晓娜",month:"3",deadline:"2026-03-31",status:"todo",priority:"medium",dept:"教师发展中心",note:"",notes:[]},
+{id:29,name:"教学创新能力大赛",owner:"董晓娜",month:"3",deadline:"2026-03-31",status:"todo",priority:"medium",dept:"教师发展中心",note:"",notes:[]},
+{id:30,name:"学期初听课安排",owner:"董晓娜",month:"3",deadline:"2026-03-31",status:"todo",priority:"medium",dept:"教学运行中心",note:"",notes:[]},
+{id:31,name:"春季学期成绩录入（补录/更正）",owner:"董晓娜",month:"3",deadline:"2026-03-31",status:"todo",priority:"medium",dept:"教学运行中心",note:"",notes:[]},
+{id:32,name:"★ 教改项目评审排序（3月11日）",owner:"李巍巍",month:"3",deadline:"2026-03-11",status:"todo",priority:"high",dept:"本科生院",note:"组织评审并形成报告",notes:[]},
+{id:33,name:"产学研创新基金（本科）",owner:"李巍巍",month:"3",deadline:"2026-03-31",status:"todo",priority:"medium",dept:"本科生院",note:"",notes:[]},
+{id:34,name:"国家智慧教育平台课程资源遴选",owner:"李巍巍",month:"3",deadline:"2026-03-31",status:"todo",priority:"medium",dept:"本科生院",note:"",notes:[]},
+{id:35,name:"本科毕业设计中期检查",owner:"李巍巍",month:"3",deadline:"2026-03-31",status:"todo",priority:"medium",dept:"本科生院",note:"",notes:[]},
+{id:36,name:"学业预警签字",owner:"李  超",month:"3",deadline:"2026-03-15",status:"todo",priority:"high",dept:"",note:"配合董晓娜+辅导员",notes:[]},
+{id:37,name:"非全调剂工作（全日制→非全）",owner:"王德芳",month:"4",deadline:"2026-04-30",status:"todo",priority:"high",dept:"研究生院",note:"需工作办法、笔试、面试",notes:[]},
+{id:38,name:"导师当量核算与录取学生确认",owner:"王德芳",month:"4",deadline:"2026-04-30",status:"todo",priority:"medium",dept:"研究生院",note:"",notes:[]},
+{id:39,name:"博士预答辩",owner:"王德芳",month:"4",deadline:"2026-04-30",status:"todo",priority:"high",dept:"研究生院",note:"3月送审论文返回后组织",notes:[]},
+{id:40,name:"研究生教育教学改革项目申报",owner:"王德芳",month:"4",deadline:"2026-04-30",status:"todo",priority:"medium",dept:"研究生院",note:"",notes:[]},
+{id:41,name:"夏季研究生学位论文答辩安排",owner:"王德芳",month:"4",deadline:"2026-04-30",status:"todo",priority:"medium",dept:"研究生院",note:"",notes:[]},
+{id:42,name:"博士生补充招生意向征集",owner:"王德芳",month:"4",deadline:"2026-04-30",status:"todo",priority:"medium",dept:"研究生院",note:"",notes:[]},
+{id:43,name:"新生入学档案整理",owner:"王德芳",month:"4",deadline:"2026-04-30",status:"todo",priority:"medium",dept:"档案馆",note:"找学生协助",notes:[]},
+{id:44,name:"两年制硕士提前毕业准备",owner:"王德芳",month:"4",deadline:"2026-04-30",status:"todo",priority:"medium",dept:"研究生院",note:"",notes:[]},
+{id:45,name:"ISW培训班",owner:"董晓娜",month:"4",deadline:"2026-04-30",status:"todo",priority:"medium",dept:"教师发展中心",note:"",notes:[]},
+{id:46,name:"本科毕业设计检查",owner:"董晓娜",month:"4",deadline:"2026-04-30",status:"todo",priority:"medium",dept:"教学运行中心",note:"",notes:[]},
+{id:47,name:"取消考试资格处理",owner:"董晓娜",month:"4",deadline:"2026-04-30",status:"todo",priority:"medium",dept:"教学运行中心",note:"",notes:[]},
+{id:48,name:"教师发展计划（关联KPI）",owner:"董晓娜",month:"4",deadline:"2026-04-30",status:"todo",priority:"medium",dept:"教师发展中心",note:"",notes:[]},
+{id:49,name:"本科生转专业和大类专业分流",owner:"李巍巍",month:"4",deadline:"2026-04-30",status:"todo",priority:"medium",dept:"本科生院",note:"",notes:[]},
+{id:50,name:"本科毕设中期检查反馈及后续",owner:"李巍巍",month:"4",deadline:"2026-04-30",status:"todo",priority:"medium",dept:"本科生院",note:"",notes:[]},
+{id:51,name:"教学建设与改革项目立项",owner:"李巍巍",month:"4",deadline:"2026-04-30",status:"todo",priority:"medium",dept:"本科生院",note:"",notes:[]},
+{id:52,name:"培养方案修订（大类）、小学期、下学期规划",owner:"李巍巍",month:"4",deadline:"2026-04-30",status:"todo",priority:"medium",dept:"本科生院",note:"",notes:[]},
+{id:53,name:"双学位相关工作",owner:"李巍巍",month:"4",deadline:"2026-04-30",status:"todo",priority:"low",dept:"本科生院",note:"",notes:[]},
+{id:54,name:"夏季博士学位论文答辩",owner:"王德芳",month:"5",deadline:"2026-05-31",status:"todo",priority:"high",dept:"研究生院",note:"",notes:[]},
+{id:55,name:"硕士学位论文送审与答辩",owner:"王德芳",month:"5",deadline:"2026-05-31",status:"todo",priority:"high",dept:"研究生院",note:"学位会在5月底",notes:[]},
+{id:56,name:"夏季硕士研究生答辩",owner:"王德芳",month:"5",deadline:"2026-05-31",status:"todo",priority:"medium",dept:"研究生院",note:"",notes:[]},
+{id:57,name:"本科生招生准备",owner:"王德芳",month:"5",deadline:"2026-05-31",status:"todo",priority:"medium",dept:"招生办",note:"5-6月集中",notes:[]},
+{id:58,name:"秋季教学计划编排",owner:"董晓娜",month:"5",deadline:"2026-05-31",status:"todo",priority:"medium",dept:"教学运行中心",note:"",notes:[]},
+{id:59,name:"期末考试准备工作",owner:"董晓娜",month:"5",deadline:"2026-05-31",status:"todo",priority:"medium",dept:"教学运行中心",note:"",notes:[]},
+{id:60,name:"校级教学建设与改革项目结题/中期检查",owner:"李巍巍",month:"5",deadline:"2026-05-31",status:"todo",priority:"medium",dept:"本科生院",note:"",notes:[]},
+{id:61,name:"本科毕业论文评阅",owner:"李巍巍",month:"5",deadline:"2026-05-31",status:"todo",priority:"medium",dept:"本科生院",note:"",notes:[]},
+{id:62,name:"本科毕业设计（论文）答辩",owner:"李巍巍",month:"5",deadline:"2026-05-31",status:"todo",priority:"high",dept:"本科生院",note:"",notes:[]},
+{id:63,name:"博士学位会（6月毕业）",owner:"王德芳",month:"6",deadline:"2026-06-30",status:"todo",priority:"high",dept:"研究生院",note:"",notes:[]},
+{id:64,name:"研究生教材选用计划填报",owner:"王德芳",month:"6",deadline:"2026-06-30",status:"todo",priority:"medium",dept:"研究生院",note:"",notes:[]},
+{id:65,name:"★ 本科生招生（大区）",owner:"王德芳",month:"6",deadline:"2026-06-30",status:"todo",priority:"high",dept:"招生办",note:"集中招生期",notes:[]},
+{id:66,name:"毕业老生科技档案存档",owner:"王德芳",month:"6",deadline:"2026-06-30",status:"todo",priority:"medium",dept:"档案馆",note:"",notes:[]},
+{id:67,name:"大学英语四六级考试",owner:"董晓娜",month:"6",deadline:"2026-06-20",status:"todo",priority:"medium",dept:"教学运行中心",note:"",notes:[]},
+{id:68,name:"夏季小学期安排",owner:"董晓娜",month:"6",deadline:"2026-06-30",status:"todo",priority:"medium",dept:"教学运行中心",note:"",notes:[]},
+{id:69,name:"统计代表性教材",owner:"李巍巍",month:"6",deadline:"2026-06-30",status:"todo",priority:"medium",dept:"本科生院",note:"",notes:[]},
+{id:70,name:"教育部课程教材研究项目申报",owner:"李巍巍",month:"6",deadline:"2026-06-30",status:"todo",priority:"medium",dept:"本科生院",note:"",notes:[]},
+{id:71,name:"本科毕设材料整改",owner:"李巍巍",month:"6",deadline:"2026-06-30",status:"todo",priority:"medium",dept:"本科生院",note:"",notes:[]},
+{id:72,name:"校级优秀本科毕业设计评选",owner:"李巍巍",month:"6",deadline:"2026-06-30",status:"todo",priority:"medium",dept:"本科生院",note:"",notes:[]},
+{id:73,name:"本科教学研究与改革论文集",owner:"李巍巍",month:"6",deadline:"2026-06-30",status:"todo",priority:"medium",dept:"本科生院",note:"",notes:[]},
+{id:74,name:"北京市教学成果奖",owner:"王德芳",month:"7",deadline:"2026-07-31",status:"todo",priority:"medium",dept:"研究生院",note:"",notes:[]},
+{id:75,name:"大学生创新创业训练计划项目",owner:"王德芳",month:"7",deadline:"2026-07-31",status:"todo",priority:"medium",dept:"研究生院",note:"",notes:[]},
+{id:76,name:"春季学期教学材料归档",owner:"董晓娜",month:"7",deadline:"2026-07-31",status:"todo",priority:"medium",dept:"教学运行中心",note:"",notes:[]},
+{id:77,name:"全国教材建设奖校内遴选推荐",owner:"李巍巍",month:"7",deadline:"2026-07-31",status:"todo",priority:"medium",dept:"本科生院",note:"",notes:[]},
+{id:78,name:"本科培养方案、课程大纲修订",owner:"李巍巍",month:"7",deadline:"2026-07-31",status:"todo",priority:"medium",dept:"本科生院",note:"",notes:[]},
+{id:79,name:"中华文化多语种数字化精品课程申报",owner:"李巍巍",month:"7",deadline:"2026-07-31",status:"todo",priority:"low",dept:"本科生院",note:"",notes:[]},
+{id:80,name:"《轮流评审》制度建设",owner:"王德芳",month:"0",deadline:"",status:"todo",priority:"medium",dept:"",note:"新事项，需建立机制",notes:[]},
+{id:81,name:"《信息化系统》建设",owner:"王德芳",month:"0",deadline:"",status:"todo",priority:"medium",dept:"",note:"需持续推进",notes:[]},
+{id:82,name:"值班表编排",owner:"王德芳",month:"0",deadline:"2026-03-07",status:"todo",priority:"medium",dept:"",note:"学期初制定",notes:[]},
+{id:83,name:"人员扩充（加人）",owner:"王德芳",month:"0",deadline:"",status:"todo",priority:"medium",dept:"",note:"人手不足",notes:[]},
+{id:84,name:"教学院长例会（持续）",owner:"董晓娜",month:"0",deadline:"",status:"todo",priority:"medium",dept:"学校",note:"李  超出席",notes:[]},
+{id:85,name:"督导听课与报告（持续）",owner:"董晓娜",month:"0",deadline:"",status:"todo",priority:"medium",dept:"教师发展中心",note:"按督导计划执行",notes:[]},
+{id:86,name:"教师发展中心相关工作（持续）",owner:"董晓娜",month:"0",deadline:"",status:"todo",priority:"medium",dept:"教师发展中心",note:"含名师、创新大赛等",notes:[]},
+{id:87,name:"优秀教师推荐上党政联席会",owner:"董晓娜",month:"0",deadline:"",status:"todo",priority:"medium",dept:"",note:"书记提出",notes:[]},
+{id:88,name:"经费管理",owner:"李巍巍",month:"0",deadline:"",status:"todo",priority:"medium",dept:"",note:"贯穿全学期",notes:[]},
+{id:89,name:"大创/竞赛管理",owner:"李巍巍",month:"0",deadline:"",status:"todo",priority:"medium",dept:"",note:"王健、段莉、彭双和、张焘等",notes:[]},
+{id:90,name:"双学位工作（持续）",owner:"李巍巍",month:"0",deadline:"",status:"todo",priority:"low",dept:"本科生院",note:"",notes:[]},
+{id:91,name:"培养方案（大类）修订（持续）",owner:"李巍巍",month:"0",deadline:"",status:"todo",priority:"medium",dept:"本科生院",note:"含小学期、下学期课程规划",notes:[]}
 ];
 
 // ===== 全局状态 =====
@@ -435,8 +435,8 @@ function getFiltered(){
 
 // ===== 工具 =====
 function fmtDate(d){if(!d)return'';var p=d.split('-');return p[1].replace(/^0/,'')+'/'+p[2].replace(/^0/,'');}
-function oCls(o){return o==='王老师'?'o-w':o==='董老师'?'o-d':o==='李老师'?'o-l':'o-dean';}
-function oTag(o){return o==='王老师'?'tg-w':o==='董老师'?'tg-d':o==='李老师'?'tg-l':'tg-dean';}
+function oCls(o){return o==='王德芳'?'o-w':o==='董晓娜'?'o-d':o==='李巍巍'?'o-l':'o-dean';}
+function oTag(o){return o==='王德芳'?'tg-w':o==='董晓娜'?'tg-d':o==='李巍巍'?'tg-l':'tg-dean';}
 function sCls(s){return 's-'+s;}
 function cCls(s){return s==='done'?'c-done':s==='doing'?'c-doing':'';}
 function dWarn(d,s){
@@ -513,7 +513,7 @@ function renderKanban(){
 
 // ===== 按负责人视图 =====
 function renderPerson(){
-  var f=getFiltered(),ps=[{n:'王老师',c:'pw',i:'🔵'},{n:'董老师',c:'pd',i:'🟢'},{n:'李老师',c:'pl',i:'🟠'},{n:'副院长',c:'pp',i:'🟣'}],h='';
+  var f=getFiltered(),ps=[{n:'王德芳',c:'pw',i:'🔵'},{n:'董晓娜',c:'pd',i:'🟢'},{n:'李巍巍',c:'pl',i:'🟠'},{n:'李  超',c:'pp',i:'🟣'}],h='';
   ps.forEach(function(p){
     var pt=f.filter(function(t){return t.owner===p.n});
     if(!pt.length)return;
@@ -558,7 +558,7 @@ function cycS(id){
 function openAdd(){
   document.getElementById('eId').value='';
   document.getElementById('eName').value='';
-  document.getElementById('eOwner').value='王老师';
+  document.getElementById('eOwner').value='王德芳';
   document.getElementById('eMonth').value='3';
   document.getElementById('ePriority').value='medium';
   document.getElementById('eStatus').value='todo';
