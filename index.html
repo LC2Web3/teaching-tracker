@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>网安学院 · 26春季工作追踪</title>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#f0f2f5;--card:#fff;--primary:#1a73e8;--plite:#e8f0fe;
+--wang:#1565c0;--wbg:#e3f2fd;--dong:#0d7c66;--dbg:#e0f2ef;
+--li:#e65100;--lbg:#fff3e0;--dean:#7b1fa2;--deanbg:#f3e5f5;
+--todo:#9e9e9e;--doing:#fb8c00;--done:#43a047;--overdue:#e53935;
+--border:#e0e0e0;--text:#1a1a1a;--text2:#555;--text3:#888;
+--shadow:0 1px 3px rgba(0,0,0,.08);--shadow2:0 4px 12px rgba(0,0,0,.12)}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--text);line-height:1.5}
+button{font-family:inherit}
+#loginOverlay{position:fixed;inset:0;background:linear-gradient(135deg,#1a237e,#1565c0);z-index:999;display:flex;align-items:center;justify-content:center}
+.login-box{background:#fff;border-radius:16px;padding:32px;max-width:380px;width:92%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.login-btn{display:block;width:100%;padding:12px 20px;margin:6px 0;border:2px solid var(--border);border-radius:10px;background:#fff;font-size:15px;cursor:pointer;transition:.2s;text-align:left}
+.login-btn:hover{border-color:var(--primary);background:var(--plite)}
+.login-btn.sel{border-color:var(--primary);background:var(--plite)}
+.header{background:linear-gradient(135deg,#1a237e,#1565c0);color:#fff;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.header h1{font-size:18px;font-weight:700}
+.header .sub{font-size:12px;opacity:.75;margin-top:2px}
+.hbtn{padding:6px 14px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.12);color:#fff;border-radius:6px;cursor:pointer;font-size:13px;transition:.2s}
+.hbtn:hover{background:rgba(255,255,255,.25)}
+.stats{display:flex;gap:12px;padding:16px 24px;overflow-x:auto;flex-wrap:wrap}
+.sc{background:var(--card);border-radius:10px;padding:14px 18px;min-width:130px;box-shadow:var(--shadow);flex-shrink:0}
+.sc .n{font-size:26px;font-weight:700}
+.sc .l{font-size:12px;color:var(--text3);margin-top:2px}
+.sc.c-total .n{color:var(--primary)} .sc.c-todo .n{color:var(--todo)} .sc.c-doing .n{color:var(--doing)} .sc.c-done .n{color:var(--done)} .sc.c-overdue .n{color:var(--overdue)}
+.progress-bar{height:5px;background:#e0e0e0;border-radius:3px;margin-top:6px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--done));border-radius:3px;transition:width .5s}
+.tabs{display:flex;background:var(--card);border-bottom:1px solid var(--border);padding:0 24px;overflow-x:auto}
+.tab{padding:11px 20px;cursor:pointer;font-size:14px;color:var(--text2);border-bottom:2px solid transparent;transition:.2s;white-space:nowrap}
+.tab:hover{color:var(--primary)} .tab.active{color:var(--primary);border-bottom-color:var(--primary);font-weight:600}
+.toolbar{display:flex;gap:10px;padding:14px 24px;flex-wrap:wrap;align-items:center}
+.toolbar select,.toolbar input{padding:7px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:#fff;outline:none}
+.toolbar select:focus,.toolbar input:focus{border-color:var(--primary)}
+.toolbar input{min-width:180px}
+.fbtn{padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:#fff;cursor:pointer;font-size:13px;transition:.2s}
+.fbtn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.fbtn:hover{border-color:var(--primary)}
+.btn{padding:7px 16px;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500;transition:.2s}
+.btn-p{background:var(--primary);color:#fff} .btn-p:hover{background:#1557b0}
+.btn-d{background:var(--overdue);color:#fff} .btn-d:hover{background:#c62828}
+.content{padding:0 24px 24px}
+.section{display:none} .section.active{display:block}
+.month-hdr{font-size:16px;font-weight:600;padding:12px 0 8px;display:flex;align-items:center;gap:8px;position:sticky;top:52px;background:var(--bg);z-index:10}
+.mbadge{background:var(--primary);color:#fff;padding:2px 10px;border-radius:12px;font-size:13px}
+.tc{background:var(--card);border-radius:8px;padding:14px 16px;margin-bottom:8px;box-shadow:var(--shadow);display:flex;align-items:flex-start;gap:12px;transition:.2s;border-left:4px solid transparent;cursor:pointer}
+.tc:hover{box-shadow:var(--shadow2);transform:translateY(-1px)}
+.tc.o-w{border-left-color:var(--wang)} .tc.o-d{border-left-color:var(--dong)} .tc.o-l{border-left-color:var(--li)} .tc.o-dean{border-left-color:var(--dean)}
+.chk{width:20px;height:20px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;margin-top:1px;transition:.2s}
+.chk:hover{border-color:var(--done)}
+.chk.c-done{background:var(--done);border-color:var(--done)}
+.chk.c-done::after{content:'✓';color:#fff;font-size:12px}
+.chk.c-doing{border-color:var(--doing)}
+.chk.c-doing::after{content:'';width:8px;height:8px;background:var(--doing);border-radius:50%}
+.tbody{flex:1;min-width:0}
+.ttitle{font-size:14px;font-weight:500}
+.ttitle.tx-done{text-decoration:line-through;color:var(--text3)}
+.tmeta{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;align-items:center}
+.tg{padding:2px 8px;border-radius:4px;font-size:11px;font-weight:500;white-space:nowrap}
+.tg-w{background:var(--wbg);color:var(--wang)} .tg-d{background:var(--dbg);color:var(--dong)} .tg-l{background:var(--lbg);color:var(--li)} .tg-dean{background:var(--deanbg);color:var(--dean)}
+.tg-dept{background:#f5f5f5;color:var(--text2)}
+.tg-s{padding:2px 8px;border-radius:4px;font-size:11px;font-weight:500}
+.tg-s.s-todo{background:#f5f5f5;color:var(--todo)} .tg-s.s-doing{background:#fff3e0;color:var(--doing)} .tg-s.s-done{background:#e8f5e9;color:var(--done)} .tg-s.s-overdue{background:#ffebee;color:var(--overdue)}
+.tg-p{font-size:11px;font-weight:600} .tg-p.p-high{color:var(--overdue)} .tg-p.p-low{color:var(--done)}
+.tnote{font-size:12px;color:var(--text3);margin-top:4px}
+.tdate{font-size:11px;color:var(--text3)} .tdate.warn{color:var(--overdue);font-weight:600}
+.tact{display:flex;gap:4px;flex-shrink:0}
+.tact button{background:#f5f5f5;border:none;border-radius:4px;padding:4px 8px;cursor:pointer;font-size:12px;transition:.15s}
+.tact button:hover{background:var(--plite)}
+.kanban{display:flex;gap:16px;overflow-x:auto;padding-bottom:8px}
+.kcol{min-width:280px;flex:1;background:var(--card);border-radius:10px;box-shadow:var(--shadow)}
+.kcol-h{padding:12px 16px;font-weight:600;font-size:14px;border-bottom:2px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.kcol-h .kc{background:var(--bg);padding:2px 8px;border-radius:10px;font-size:12px}
+.kcol-b{padding:8px;max-height:70vh;overflow-y:auto}
+.kcard{background:var(--bg);border-radius:8px;padding:12px;margin-bottom:8px;cursor:pointer;border-left:3px solid transparent;transition:.15s;font-size:13px}
+.kcard:hover{box-shadow:var(--shadow2);transform:translateY(-1px)}
+.kcard.o-w{border-left-color:var(--wang)} .kcard.o-d{border-left-color:var(--dong)} .kcard.o-l{border-left-color:var(--li)} .kcard.o-dean{border-left-color:var(--dean)}
+.kcard-t{font-weight:600;margin-bottom:6px}
+.kcard-m{display:flex;gap:4px;flex-wrap:wrap}
+.pcol{margin-bottom:20px}
+.pcol-h{padding:12px 16px;border-radius:10px 10px 0 0;font-size:16px;font-weight:600;display:flex;justify-content:space-between;align-items:center}
+.pcol-h.pw{background:var(--wbg);color:var(--wang)} .pcol-h.pd{background:var(--dbg);color:var(--dong)} .pcol-h.pl{background:var(--lbg);color:var(--li)} .pcol-h.pp{background:var(--deanbg);color:var(--dean)}
+.pcol-b{background:var(--card);border-radius:0 0 10px 10px;padding:8px;box-shadow:var(--shadow)}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;justify-content:center;align-items:center}
+.modal-bg.show{display:flex}
+.modal{background:#fff;border-radius:12px;padding:24px;width:92%;max-width:540px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.modal h2{font-size:18px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
+.modal h2 .close{cursor:pointer;font-size:22px;color:var(--text3);background:none;border:none}
+.fg{margin-bottom:14px}
+.fg label{display:block;font-size:13px;font-weight:600;margin-bottom:4px;color:var(--text2)}
+.fg input,.fg select,.fg textarea{width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px;font-family:inherit;outline:none}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--primary)}
+.fg textarea{resize:vertical;min-height:60px}
+.frow{display:flex;gap:12px} .frow .fg{flex:1}
+.mactions{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}
+.notes-sec{margin-top:16px;padding-top:12px;border-top:1px solid var(--border)}
+.notes-sec h4{margin-bottom:8px;font-size:14px}
+.note-item{background:var(--bg);padding:8px 12px;border-radius:6px;margin-bottom:6px;font-size:12px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.note-item .nd{color:var(--text3);font-size:11px;white-space:nowrap}
+.note-row{display:flex;gap:6px;margin-top:8px}
+.note-row input{flex:1}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#333;color:#fff;padding:10px 24px;border-radius:8px;font-size:14px;z-index:300;opacity:0;transition:.3s}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.fab{position:fixed;bottom:24px;right:24px;width:52px;height:52px;border-radius:50%;background:var(--primary);color:#fff;border:none;font-size:28px;cursor:pointer;box-shadow:0 4px 12px rgba(26,115,232,.4);z-index:50;transition:.2s;display:flex;align-items:center;justify-content:center}
+.fab:hover{transform:scale(1.1)}
+@media(max-width:768px){
+.content{padding:0 12px 12px}.stats{padding:12px}.toolbar{padding:10px 12px}
+.kanban{flex-direction:column}.kcol{min-width:100%}.frow{flex-direction:column;gap:0}
+.header h1{font-size:15px}
+}
+</style>
+</head>
+<body>
+
+<!-- ========== 登录界面 ========== -->
+<div id="loginOverlay">
+<div class="login-box">
+<div style="font-size:48px;margin-bottom:8px">📋</div>
+<h2 style="margin-bottom:4px">网安学院 · 工作追踪</h2>
+<p style="color:#888;font-size:13px;margin-bottom:20px">26春季学期 · 请选择身份</p>
+<button class="login-btn" onclick="selRole(this,'副院长')">🟣 副院长（我）</button>
+<button class="login-btn" onclick="selRole(this,'王老师')">🔵 王老师</button>
+<button class="login-btn" onclick="selRole(this,'董老师')">🟢 董老师</button>
+<button class="login-btn" onclick="selRole(this,'李老师')">🟠 李老师</button>
+<div style="margin-top:16px">
+<input type="password" id="pinInput" placeholder="输入访问密码" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:14px;text-align:center" onkeydown="if(event.key==='Enter')doLogin()">
+</div>
+<button onclick="doLogin()" style="width:100%;padding:12px;margin-top:10px;background:#1a73e8;color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer">登 录</button>
+<div id="loginErr" style="color:#e53935;font-size:12px;margin-top:8px;display:none">❌ 密码错误或未选身份</div>
+</div>
+</div>
+
+<!-- ========== 主应用 ========== -->
+<div id="mainApp" style="display:none">
+<div class="header">
+<div>
+<h1>📋 网安学院 · 26年春季学期工作追踪</h1>
+<div class="sub">教学副院长 · 管理看板 &nbsp;<span id="syncStatus" style="font-size:11px">⏳ 连接中...</span></div>
+</div>
+<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+<span id="userBadge" style="padding:4px 12px;border-radius:12px;font-size:12px;background:rgba(255,255,255,.2)"></span>
+<button class="hbtn" onclick="openAdd()">＋ 新增</button>
+<button class="hbtn" onclick="exportJSON()">📤 导出</button>
+<button class="hbtn" onclick="document.getElementById('imp').click()">📥 导入</button>
+<input type="file" id="imp" accept=".json" style="display:none" onchange="importJSON(event)">
+<button class="hbtn" onclick="resetAll()">🔄 重置</button>
+<button class="hbtn" onclick="logout()">🚪</button>
+</div>
+</div>
+<div class="stats" id="statsBar"></div>
+<div class="tabs">
+<div class="tab active" onclick="switchTab('list',this)">📋 按月查看</div>
+<div class="tab" onclick="switchTab('kanban',this)">📊 状态看板</div>
+<div class="tab" onclick="switchTab('person',this)">👥 按负责人</div>
+</div>
+<div class="toolbar">
+<label style="font-size:13px;color:var(--text2)">负责人：</label>
+<button class="fbtn active" onclick="setOwner('all',this)">全部</button>
+<button class="fbtn" onclick="setOwner('王老师',this)">🔵王</button>
+<button class="fbtn" onclick="setOwner('董老师',this)">🟢董</button>
+<button class="fbtn" onclick="setOwner('李老师',this)">🟠李</button>
+<button class="fbtn" onclick="setOwner('副院长',this)">🟣我</button>
+<select id="fMonth" onchange="render()"><option value="all">全部月份</option><option value="2">2月</option><option value="3">3月</option><option value="4">4月</option><option value="5">5月</option><option value="6">6月</option><option value="7">7月</option><option value="0">贯穿学期</option></select>
+<select id="fStatus" onchange="render()"><option value="all">全部状态</option><option value="todo">待启动</option><option value="doing">进行中</option><option value="done">已完成</option></select>
+<input type="text" id="fSearch" placeholder="🔍 搜索任务..." oninput="render()">
+</div>
+<div class="content">
+<div class="section active" id="sec-list"></div>
+<div class="section" id="sec-kanban"></div>
+<div class="section" id="sec-person"></div>
+</div>
+<button class="fab" onclick="openAdd()" title="新增任务">＋</button>
+</div>
+
+<!-- 编辑弹窗 -->
+<div class="modal-bg" id="editModal">
+<div class="modal">
+<h2><span id="editTitle">新增任务</span><button class="close" onclick="closeEdit()">×</button></h2>
+<input type="hidden" id="eId">
+<div class="fg"><label>任务名称 *</label><input id="eName" placeholder="任务名称"></div>
+<div class="frow">
+<div class="fg"><label>负责人</label><select id="eOwner"><option value="王老师">🔵 王老师</option><option value="董老师">🟢 董老师</option><option value="李老师">🟠 李老师</option><option value="副院长">🟣 副院长</option></select></div>
+<div class="fg"><label>月份</label><select id="eMonth"><option value="2">2月</option><option value="3">3月</option><option value="4">4月</option><option value="5">5月</option><option value="6">6月</option><option value="7">7月</option><option value="0">贯穿学期</option></select></div>
+</div>
+<div class="frow">
+<div class="fg"><label>优先级</label><select id="ePriority"><option value="high">🔴 高</option><option value="medium" selected>🟡 中</option><option value="low">🟢 低</option></select></div>
+<div class="fg"><label>状态</label><select id="eStatus"><option value="todo">待启动</option><option value="doing">进行中</option><option value="done">已完成</option></select></div>
+</div>
+<div class="frow">
+<div class="fg"><label>截止日期</label><input type="date" id="eDeadline"></div>
+<div class="fg"><label>对接单位</label><input id="eDept" placeholder="如：研究生院"></div>
+</div>
+<div class="fg"><label>备注</label><textarea id="eNote" placeholder="补充说明..."></textarea></div>
+<div class="mactions">
+<button class="btn" style="background:#f5f5f5;color:var(--text2)" onclick="closeEdit()">取消</button>
+<button class="btn btn-d" id="delBtn" style="display:none" onclick="delTask()">删除</button>
+<button class="btn btn-p" onclick="saveTask()">保存</button>
+</div>
+</div>
+</div>
+
+<!-- 详情弹窗 -->
+<div class="modal-bg" id="detailModal">
+<div class="modal">
+<h2><span id="dtTitle"></span><button class="close" onclick="closeDt()">×</button></h2>
+<div id="dtBody"></div>
+<div class="notes-sec">
+<h4>📝 跟进记录</h4>
+<div id="dtNotes"></div>
+<div class="note-row">
+<input id="noteIn" placeholder="添加跟进记录..." onkeydown="if(event.key==='Enter')addNote()">
+<button class="btn btn-p" style="padding:6px 12px" onclick="addNote()">添加</button>
+</div>
+</div>
+<div class="mactions" style="margin-top:16px">
+<button class="btn" style="background:#f5f5f5;color:var(--text2)" onclick="closeDt()">关闭</button>
+<button class="btn btn-p" onclick="editFromDt()">✏️ 编辑</button>
+</div>
+</div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+//  ⚠️⚠️⚠️  第1处必改：替换成你自己的 Firebase 配置  ⚠️⚠️⚠️
+// ============================================================
+var firebaseConfig = {
+  apiKey: "AIzaSyC6eY80DTNFBUUiwdUx5sR5oHwt6_B-9xA",
+  authDomain: "teaching-tracker-4d49c.firebaseapp.com",
+  databaseURL: "https://teaching-tracker-4d49c-default-rtdb.firebaseio.com",
+  projectId: "teaching-tracker-4d49c"
+};
+
+// ⚠️ 第2处可改：访问密码（告诉四个人即可）
+var ACCESS_PIN = "bmxyrcb";
+
+// ===== 91项预设任务 =====
+var TASKS=[
+{id:1,name:"研究生老生注册、报到、退学处理、学业警示",owner:"王老师",month:"2",deadline:"2026-03-09",status:"todo",priority:"high",dept:"研究生院",note:"3月9日前报给研究生院",notes:[]},
+{id:2,name:"本科/研究生注册率统计",owner:"董老师",month:"2",deadline:"2026-03-07",status:"todo",priority:"high",dept:"教学运行中心",note:"管理岗发劳务，安排学生协助",notes:[]},
+{id:3,name:"本科退补选",owner:"董老师",month:"2",deadline:"2026-03-07",status:"todo",priority:"high",dept:"教学运行中心",note:"",notes:[]},
+{id:4,name:"上学期教学资料归档",owner:"董老师",month:"2",deadline:"2026-03-15",status:"todo",priority:"medium",dept:"教学运行中心",note:"",notes:[]},
+{id:5,name:"本学期教学资料检查（开课提醒/主讲确认/助课/资料上传）",owner:"董老师",month:"2",deadline:"2026-03-07",status:"todo",priority:"high",dept:"教学运行中心",note:"",notes:[]},
+{id:6,name:"★ 开学第一节课检查（周一）",owner:"副院长",month:"2",deadline:"2026-03-02",status:"todo",priority:"high",dept:"",note:"副院长亲自到场检查",notes:[]},
+{id:7,name:"上学期补考安排",owner:"董老师",month:"2",deadline:"2026-03-14",status:"todo",priority:"medium",dept:"教学运行中心",note:"提醒教师不要缺勤",notes:[]},
+{id:8,name:"休学审批",owner:"董老师",month:"2",deadline:"",status:"todo",priority:"medium",dept:"本科教学服务平台",note:"MIS→11号平台→教务系统；需副院长签字",notes:[]},
+{id:9,name:"学业预警流程",owner:"董老师",month:"2",deadline:"2026-03-15",status:"todo",priority:"high",dept:"",note:"董老师+辅导员协作，副院长签字",notes:[]},
+{id:10,name:"研究生复试成绩公布与划线",owner:"王老师",month:"2",deadline:"2026-03-06",status:"todo",priority:"high",dept:"研究生院",note:"2月末出成绩，研究生院先画线后与学院沟通",notes:[]},
+{id:11,name:"教改项目评审准备（3/2预审）",owner:"李老师",month:"2",deadline:"2026-03-02",status:"todo",priority:"high",dept:"本科生院",note:"3/2先看材料，3/11正式评审排序",notes:[]},
+{id:12,name:"国家教学名师申报",owner:"董老师",month:"2",deadline:"2026-03-31",status:"todo",priority:"medium",dept:"教师发展中心",note:"",notes:[]},
+{id:13,name:"优秀主讲教师（优主）评选",owner:"董老师",month:"2",deadline:"2026-03-31",status:"todo",priority:"medium",dept:"教学运行中心",note:"",notes:[]},
+{id:14,name:"大类课程上课问题协调（彭老师、大林老师）",owner:"董老师",month:"2",deadline:"2026-03-07",status:"todo",priority:"high",dept:"教学运行中心",note:"涉及大类的两门课",notes:[]},
+{id:15,name:"新教师安排（马昊玉）",owner:"董老师",month:"2",deadline:"2026-03-15",status:"todo",priority:"medium",dept:"教师发展中心",note:"新入职教师教学安排与指导",notes:[]},
+{id:16,name:"★ 研究生复试全流程（工作办法/命题/面试/资格审核）",owner:"王老师",month:"3",deadline:"2026-03-20",status:"todo",priority:"high",dept:"研究生院",note:"笔试命题；面试题库；资格审核",notes:[]},
+{id:17,name:"★ 向院长汇报复试工作",owner:"副院长",month:"3",deadline:"2026-03-06",status:"todo",priority:"high",dept:"院领导",note:"确定成绩，准备招生录取办法与命题方案",notes:[]},
+{id:18,name:"查看生源数据，落实招生指标",owner:"王老师",month:"3",deadline:"2026-03-15",status:"todo",priority:"high",dept:"研究生院",note:"根据生源质量调整招生策略",notes:[]},
+{id:19,name:"导师博士/硕士研究生指标分配说明",owner:"王老师",month:"3",deadline:"2026-03-31",status:"todo",priority:"high",dept:"研究生院",note:"推免/统招、专硕/学硕、专项不限制",notes:[]},
+{id:20,name:"博士招生（定向）—科研经费/缴费/录取",owner:"王老师",month:"3",deadline:"2026-03-31",status:"todo",priority:"high",dept:"研究生院",note:"校内校外科研经费审核，缴费确认",notes:[]},
+{id:21,name:"博士补充招生（新增指标）",owner:"王老师",month:"3",deadline:"2026-03-31",status:"todo",priority:"medium",dept:"研究生院",note:"3月中下旬新增指标后再来一次",notes:[]},
+{id:22,name:"博士学位论文送审（8-10人）",owner:"王老师",month:"3",deadline:"2026-03-31",status:"todo",priority:"high",dept:"研究生院",note:"送审周期约一个月",notes:[]},
+{id:23,name:"研究生教育教学改革研究项目检查",owner:"王老师",month:"3",deadline:"2026-03-31",status:"todo",priority:"medium",dept:"研究生院",note:"",notes:[]},
+{id:24,name:"核实科研当量",owner:"王老师",month:"3",deadline:"2026-03-31",status:"todo",priority:"medium",dept:"研究生院",note:"",notes:[]},
+{id:25,name:"产学研创新基金",owner:"王老师",month:"3",deadline:"2026-03-31",status:"todo",priority:"medium",dept:"研究生院",note:"王老师和李老师均涉及",notes:[]},
+{id:26,name:"教学院长例会",owner:"董老师",month:"3",deadline:"",status:"todo",priority:"medium",dept:"学校",note:"副院长出席",notes:[]},
+{id:27,name:"督导计划执行与报告",owner:"董老师",month:"3",deadline:"2026-03-31",status:"todo",priority:"medium",dept:"教师发展中心",note:"签字后上交",notes:[]},
+{id:28,name:"青年教师研修班",owner:"董老师",month:"3",deadline:"2026-03-31",status:"todo",priority:"medium",dept:"教师发展中心",note:"",notes:[]},
+{id:29,name:"教学创新能力大赛",owner:"董老师",month:"3",deadline:"2026-03-31",status:"todo",priority:"medium",dept:"教师发展中心",note:"",notes:[]},
+{id:30,name:"学期初听课安排",owner:"董老师",month:"3",deadline:"2026-03-31",status:"todo",priority:"medium",dept:"教学运行中心",note:"",notes:[]},
+{id:31,name:"春季学期成绩录入（补录/更正）",owner:"董老师",month:"3",deadline:"2026-03-31",status:"todo",priority:"medium",dept:"教学运行中心",note:"",notes:[]},
+{id:32,name:"★ 教改项目评审排序（3月11日）",owner:"李老师",month:"3",deadline:"2026-03-11",status:"todo",priority:"high",dept:"本科生院",note:"组织评审并形成报告",notes:[]},
+{id:33,name:"产学研创新基金（本科）",owner:"李老师",month:"3",deadline:"2026-03-31",status:"todo",priority:"medium",dept:"本科生院",note:"",notes:[]},
+{id:34,name:"国家智慧教育平台课程资源遴选",owner:"李老师",month:"3",deadline:"2026-03-31",status:"todo",priority:"medium",dept:"本科生院",note:"",notes:[]},
+{id:35,name:"本科毕业设计中期检查",owner:"李老师",month:"3",deadline:"2026-03-31",status:"todo",priority:"medium",dept:"本科生院",note:"",notes:[]},
+{id:36,name:"学业预警签字",owner:"副院长",month:"3",deadline:"2026-03-15",status:"todo",priority:"high",dept:"",note:"配合董老师+辅导员",notes:[]},
+{id:37,name:"非全调剂工作（全日制→非全）",owner:"王老师",month:"4",deadline:"2026-04-30",status:"todo",priority:"high",dept:"研究生院",note:"需工作办法、笔试、面试",notes:[]},
+{id:38,name:"导师当量核算与录取学生确认",owner:"王老师",month:"4",deadline:"2026-04-30",status:"todo",priority:"medium",dept:"研究生院",note:"",notes:[]},
+{id:39,name:"博士预答辩",owner:"王老师",month:"4",deadline:"2026-04-30",status:"todo",priority:"high",dept:"研究生院",note:"3月送审论文返回后组织",notes:[]},
+{id:40,name:"研究生教育教学改革项目申报",owner:"王老师",month:"4",deadline:"2026-04-30",status:"todo",priority:"medium",dept:"研究生院",note:"",notes:[]},
+{id:41,name:"夏季研究生学位论文答辩安排",owner:"王老师",month:"4",deadline:"2026-04-30",status:"todo",priority:"medium",dept:"研究生院",note:"",notes:[]},
+{id:42,name:"博士生补充招生意向征集",owner:"王老师",month:"4",deadline:"2026-04-30",status:"todo",priority:"medium",dept:"研究生院",note:"",notes:[]},
+{id:43,name:"新生入学档案整理",owner:"王老师",month:"4",deadline:"2026-04-30",status:"todo",priority:"medium",dept:"档案馆",note:"找学生协助",notes:[]},
+{id:44,name:"两年制硕士提前毕业准备",owner:"王老师",month:"4",deadline:"2026-04-30",status:"todo",priority:"medium",dept:"研究生院",note:"",notes:[]},
+{id:45,name:"ISW培训班",owner:"董老师",month:"4",deadline:"2026-04-30",status:"todo",priority:"medium",dept:"教师发展中心",note:"",notes:[]},
+{id:46,name:"本科毕业设计检查",owner:"董老师",month:"4",deadline:"2026-04-30",status:"todo",priority:"medium",dept:"教学运行中心",note:"",notes:[]},
+{id:47,name:"取消考试资格处理",owner:"董老师",month:"4",deadline:"2026-04-30",status:"todo",priority:"medium",dept:"教学运行中心",note:"",notes:[]},
+{id:48,name:"教师发展计划（关联KPI）",owner:"董老师",month:"4",deadline:"2026-04-30",status:"todo",priority:"medium",dept:"教师发展中心",note:"",notes:[]},
+{id:49,name:"本科生转专业和大类专业分流",owner:"李老师",month:"4",deadline:"2026-04-30",status:"todo",priority:"medium",dept:"本科生院",note:"",notes:[]},
+{id:50,name:"本科毕设中期检查反馈及后续",owner:"李老师",month:"4",deadline:"2026-04-30",status:"todo",priority:"medium",dept:"本科生院",note:"",notes:[]},
+{id:51,name:"教学建设与改革项目立项",owner:"李老师",month:"4",deadline:"2026-04-30",status:"todo",priority:"medium",dept:"本科生院",note:"",notes:[]},
+{id:52,name:"培养方案修订（大类）、小学期、下学期规划",owner:"李老师",month:"4",deadline:"2026-04-30",status:"todo",priority:"medium",dept:"本科生院",note:"",notes:[]},
+{id:53,name:"双学位相关工作",owner:"李老师",month:"4",deadline:"2026-04-30",status:"todo",priority:"low",dept:"本科生院",note:"",notes:[]},
+{id:54,name:"夏季博士学位论文答辩",owner:"王老师",month:"5",deadline:"2026-05-31",status:"todo",priority:"high",dept:"研究生院",note:"",notes:[]},
+{id:55,name:"硕士学位论文送审与答辩",owner:"王老师",month:"5",deadline:"2026-05-31",status:"todo",priority:"high",dept:"研究生院",note:"学位会在5月底",notes:[]},
+{id:56,name:"夏季硕士研究生答辩",owner:"王老师",month:"5",deadline:"2026-05-31",status:"todo",priority:"medium",dept:"研究生院",note:"",notes:[]},
+{id:57,name:"本科生招生准备",owner:"王老师",month:"5",deadline:"2026-05-31",status:"todo",priority:"medium",dept:"招生办",note:"5-6月集中",notes:[]},
+{id:58,name:"秋季教学计划编排",owner:"董老师",month:"5",deadline:"2026-05-31",status:"todo",priority:"medium",dept:"教学运行中心",note:"",notes:[]},
+{id:59,name:"期末考试准备工作",owner:"董老师",month:"5",deadline:"2026-05-31",status:"todo",priority:"medium",dept:"教学运行中心",note:"",notes:[]},
+{id:60,name:"校级教学建设与改革项目结题/中期检查",owner:"李老师",month:"5",deadline:"2026-05-31",status:"todo",priority:"medium",dept:"本科生院",note:"",notes:[]},
+{id:61,name:"本科毕业论文评阅",owner:"李老师",month:"5",deadline:"2026-05-31",status:"todo",priority:"medium",dept:"本科生院",note:"",notes:[]},
+{id:62,name:"本科毕业设计（论文）答辩",owner:"李老师",month:"5",deadline:"2026-05-31",status:"todo",priority:"high",dept:"本科生院",note:"",notes:[]},
+{id:63,name:"博士学位会（6月毕业）",owner:"王老师",month:"6",deadline:"2026-06-30",status:"todo",priority:"high",dept:"研究生院",note:"",notes:[]},
+{id:64,name:"研究生教材选用计划填报",owner:"王老师",month:"6",deadline:"2026-06-30",status:"todo",priority:"medium",dept:"研究生院",note:"",notes:[]},
+{id:65,name:"★ 本科生招生（大区）",owner:"王老师",month:"6",deadline:"2026-06-30",status:"todo",priority:"high",dept:"招生办",note:"集中招生期",notes:[]},
+{id:66,name:"毕业老生科技档案存档",owner:"王老师",month:"6",deadline:"2026-06-30",status:"todo",priority:"medium",dept:"档案馆",note:"",notes:[]},
+{id:67,name:"大学英语四六级考试",owner:"董老师",month:"6",deadline:"2026-06-20",status:"todo",priority:"medium",dept:"教学运行中心",note:"",notes:[]},
+{id:68,name:"夏季小学期安排",owner:"董老师",month:"6",deadline:"2026-06-30",status:"todo",priority:"medium",dept:"教学运行中心",note:"",notes:[]},
+{id:69,name:"统计代表性教材",owner:"李老师",month:"6",deadline:"2026-06-30",status:"todo",priority:"medium",dept:"本科生院",note:"",notes:[]},
+{id:70,name:"教育部课程教材研究项目申报",owner:"李老师",month:"6",deadline:"2026-06-30",status:"todo",priority:"medium",dept:"本科生院",note:"",notes:[]},
+{id:71,name:"本科毕设材料整改",owner:"李老师",month:"6",deadline:"2026-06-30",status:"todo",priority:"medium",dept:"本科生院",note:"",notes:[]},
+{id:72,name:"校级优秀本科毕业设计评选",owner:"李老师",month:"6",deadline:"2026-06-30",status:"todo",priority:"medium",dept:"本科生院",note:"",notes:[]},
+{id:73,name:"本科教学研究与改革论文集",owner:"李老师",month:"6",deadline:"2026-06-30",status:"todo",priority:"medium",dept:"本科生院",note:"",notes:[]},
+{id:74,name:"北京市教学成果奖",owner:"王老师",month:"7",deadline:"2026-07-31",status:"todo",priority:"medium",dept:"研究生院",note:"",notes:[]},
+{id:75,name:"大学生创新创业训练计划项目",owner:"王老师",month:"7",deadline:"2026-07-31",status:"todo",priority:"medium",dept:"研究生院",note:"",notes:[]},
+{id:76,name:"春季学期教学材料归档",owner:"董老师",month:"7",deadline:"2026-07-31",status:"todo",priority:"medium",dept:"教学运行中心",note:"",notes:[]},
+{id:77,name:"全国教材建设奖校内遴选推荐",owner:"李老师",month:"7",deadline:"2026-07-31",status:"todo",priority:"medium",dept:"本科生院",note:"",notes:[]},
+{id:78,name:"本科培养方案、课程大纲修订",owner:"李老师",month:"7",deadline:"2026-07-31",status:"todo",priority:"medium",dept:"本科生院",note:"",notes:[]},
+{id:79,name:"中华文化多语种数字化精品课程申报",owner:"李老师",month:"7",deadline:"2026-07-31",status:"todo",priority:"low",dept:"本科生院",note:"",notes:[]},
+{id:80,name:"《轮流评审》制度建设",owner:"王老师",month:"0",deadline:"",status:"todo",priority:"medium",dept:"",note:"新事项，需建立机制",notes:[]},
+{id:81,name:"《信息化系统》建设",owner:"王老师",month:"0",deadline:"",status:"todo",priority:"medium",dept:"",note:"需持续推进",notes:[]},
+{id:82,name:"值班表编排",owner:"王老师",month:"0",deadline:"2026-03-07",status:"todo",priority:"medium",dept:"",note:"学期初制定",notes:[]},
+{id:83,name:"人员扩充（加人）",owner:"王老师",month:"0",deadline:"",status:"todo",priority:"medium",dept:"",note:"人手不足",notes:[]},
+{id:84,name:"教学院长例会（持续）",owner:"董老师",month:"0",deadline:"",status:"todo",priority:"medium",dept:"学校",note:"副院长出席",notes:[]},
+{id:85,name:"督导听课与报告（持续）",owner:"董老师",month:"0",deadline:"",status:"todo",priority:"medium",dept:"教师发展中心",note:"按督导计划执行",notes:[]},
+{id:86,name:"教师发展中心相关工作（持续）",owner:"董老师",month:"0",deadline:"",status:"todo",priority:"medium",dept:"教师发展中心",note:"含名师、创新大赛等",notes:[]},
+{id:87,name:"优秀教师推荐上党政联席会",owner:"董老师",month:"0",deadline:"",status:"todo",priority:"medium",dept:"",note:"书记提出",notes:[]},
+{id:88,name:"经费管理",owner:"李老师",month:"0",deadline:"",status:"todo",priority:"medium",dept:"",note:"贯穿全学期",notes:[]},
+{id:89,name:"大创/竞赛管理",owner:"李老师",month:"0",deadline:"",status:"todo",priority:"medium",dept:"",note:"王健、段莉、彭双和、张焘等",notes:[]},
+{id:90,name:"双学位工作（持续）",owner:"李老师",month:"0",deadline:"",status:"todo",priority:"low",dept:"本科生院",note:"",notes:[]},
+{id:91,name:"培养方案（大类）修订（持续）",owner:"李老师",month:"0",deadline:"",status:"todo",priority:"medium",dept:"本科生院",note:"含小学期、下学期课程规划",notes:[]}
+];
+
+// ===== 全局状态 =====
+var tasks=[],db=null,currentUser='',curTab='list',curOwner='all',nextId=100,dtId=null,isModalOpen=false;
+var MN={'2':'📖 2月（开学）','3':'🔥 3月（核心攻坚）','4':'📋 4月','5':'🎓 5月','6':'🏆 6月','7':'📦 7月','0':'🔄 贯穿学期'};
+var SN={todo:'待启动',doing:'进行中',done:'已完成'};
+var PN={high:'🔴高',medium:'🟡中',low:'🟢低'};
+function clone(o){return JSON.parse(JSON.stringify(o))}
+
+// ===== 登录系统 =====
+var selectedRole='';
+function selRole(btn,role){
+  selectedRole=role;
+  document.querySelectorAll('.login-btn').forEach(function(b){b.classList.remove('sel')});
+  btn.classList.add('sel');
+}
+function doLogin(){
+  var pin=document.getElementById('pinInput').value;
+  if(pin!==ACCESS_PIN||!selectedRole){
+    document.getElementById('loginErr').style.display='block';return;
+  }
+  currentUser=selectedRole;
+  localStorage.setItem('watt_user',currentUser);
+  document.getElementById('loginOverlay').style.display='none';
+  document.getElementById('mainApp').style.display='block';
+  document.getElementById('userBadge').textContent=currentUser;
+  initFirebase();
+}
+function logout(){localStorage.removeItem('watt_user');location.reload();}
+
+// 自动登录（如果之前登录过）
+(function(){
+  var u=localStorage.getItem('watt_user');
+  if(u){
+    currentUser=u;
+    document.getElementById('loginOverlay').style.display='none';
+    document.getElementById('mainApp').style.display='block';
+    document.getElementById('userBadge').textContent=u;
+    initFirebase();
+  }
+})();
+
+// ===== Firebase 初始化 =====
+function initFirebase(){
+  try{
+    firebase.initializeApp(firebaseConfig);
+  }catch(e){}
+  db=firebase.database();
+
+  // 连接状态
+  db.ref('.info/connected').on('value',function(s){
+    var el=document.getElementById('syncStatus');
+    el.innerHTML=s.val()?'🟢 已连接 · 实时同步':'🔴 离线';
+  });
+
+  // 监听数据变化（实时同步核心）
+  db.ref('taskData').on('value',function(snapshot){
+    var str=snapshot.val();
+    if(str){
+      try{
+        tasks=JSON.parse(str);
+        tasks.forEach(function(t){if(!t.notes)t.notes=[];});
+        nextId=Math.max.apply(null,tasks.map(function(t){return t.id}))+1;
+      }catch(e){tasks=clone(TASKS);}
+    }else{
+      // 首次使用，写入默认数据
+      tasks=clone(TASKS);
+      save();return;
+    }
+    if(!isModalOpen)render();
+  });
+}
+
+// ===== 保存到 Firebase（带防抖）=====
+var saveTimer=null;
+function save(){
+  if(saveTimer)clearTimeout(saveTimer);
+  saveTimer=setTimeout(function(){
+    if(db){
+      db.ref('taskData').set(JSON.stringify(tasks));
+      db.ref('meta').set({user:currentUser,time:firebase.database.ServerValue.TIMESTAMP});
+    }
+  },300);
+}
+
+// ===== 筛选 =====
+function getFiltered(){
+  var fm=document.getElementById('fMonth').value;
+  var fs=document.getElementById('fStatus').value;
+  var fq=(document.getElementById('fSearch').value||'').toLowerCase();
+  return tasks.filter(function(t){
+    if(curOwner!=='all'&&t.owner!==curOwner)return false;
+    if(fm!=='all'&&t.month!==fm)return false;
+    if(fs!=='all'&&t.status!==fs)return false;
+    if(fq&&t.name.toLowerCase().indexOf(fq)<0&&(t.note||'').toLowerCase().indexOf(fq)<0&&(t.dept||'').toLowerCase().indexOf(fq)<0)return false;
+    return true;
+  });
+}
+
+// ===== 工具 =====
+function fmtDate(d){if(!d)return'';var p=d.split('-');return p[1].replace(/^0/,'')+'/'+p[2].replace(/^0/,'');}
+function oCls(o){return o==='王老师'?'o-w':o==='董老师'?'o-d':o==='李老师'?'o-l':'o-dean';}
+function oTag(o){return o==='王老师'?'tg-w':o==='董老师'?'tg-d':o==='李老师'?'tg-l':'tg-dean';}
+function sCls(s){return 's-'+s;}
+function cCls(s){return s==='done'?'c-done':s==='doing'?'c-doing':'';}
+function dWarn(d,s){
+  if(!d||s==='done')return'';
+  var diff=(new Date(d)-new Date())/(864e5);
+  if(diff<0)return' <span class="tdate warn">⚠️逾期'+Math.abs(Math.floor(diff))+'天</span>';
+  if(diff<7)return' <span class="tdate" style="color:var(--doing);font-weight:600">⏰剩'+Math.floor(diff)+'天</span>';
+  return'';
+}
+function toast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2000);}
+
+// ===== 统计 =====
+function renderStats(){
+  var all=tasks.length,todo=0,doing=0,done=0,over=0;
+  tasks.forEach(function(t){
+    if(t.status==='done')done++;
+    else if(t.status==='doing')doing++;
+    else{if(t.deadline&&new Date(t.deadline)<new Date())over++;else todo++;}
+  });
+  var pct=all?Math.round(done/all*100):0;
+  document.getElementById('statsBar').innerHTML=
+    '<div class="sc c-total"><div class="n">'+all+'</div><div class="l">总任务</div><div class="progress-bar"><div class="progress-fill" style="width:'+pct+'%"></div></div><div class="l" style="margin-top:4px">完成率 '+pct+'%</div></div>'+
+    '<div class="sc c-todo"><div class="n">'+todo+'</div><div class="l">待启动</div></div>'+
+    '<div class="sc c-doing"><div class="n">'+doing+'</div><div class="l">进行中</div></div>'+
+    '<div class="sc c-done"><div class="n">'+done+'</div><div class="l">已完成</div></div>'+
+    '<div class="sc c-overdue"><div class="n">'+over+'</div><div class="l">⚠️逾期</div></div>';
+}
+
+// ===== 任务卡片 =====
+function tHTML(t){
+  var tc=cCls(t.status),oc=oCls(t.owner),ot=oTag(t.owner);
+  var titC=t.status==='done'?'ttitle tx-done':'ttitle';
+  var pC=t.priority==='high'?'tg-p p-high':t.priority==='low'?'tg-p p-low':'tg-p';
+  var ds=t.deadline?'<span class="tdate">📅'+fmtDate(t.deadline)+'</span>':'';
+  return '<div class="tc '+oc+'" onclick="openDt('+t.id+')">'+
+    '<div class="chk '+tc+'" onclick="event.stopPropagation();togS('+t.id+')"></div>'+
+    '<div class="tbody"><div class="'+titC+'">'+t.name+'</div><div class="tmeta">'+
+    '<span class="tg '+ot+'">'+t.owner+'</span>'+
+    (t.dept?'<span class="tg tg-dept">'+t.dept+'</span>':'')+
+    '<span class="tg-s '+sCls(t.status)+'">'+SN[t.status]+'</span>'+
+    '<span class="'+pC+'">'+PN[t.priority]+'</span>'+ds+dWarn(t.deadline,t.status)+
+    '</div>'+(t.note?'<div class="tnote">💡 '+t.note+'</div>':'')+'</div>'+
+    '<div class="tact"><button onclick="event.stopPropagation();openEdit('+t.id+')">✏️</button>'+
+    '<button onclick="event.stopPropagation();cycS('+t.id+')">🔄</button></div></div>';
+}
+
+// ===== 列表视图 =====
+function renderList(){
+  var f=getFiltered(),ms=['2','3','4','5','6','7','0'],h='';
+  ms.forEach(function(m){
+    var mt=f.filter(function(t){return t.month===m});
+    if(!mt.length)return;
+    var dc=mt.filter(function(t){return t.status==='done'}).length;
+    h+='<div class="month-hdr"><span class="mbadge">'+MN[m]+'</span><span class="mcount" style="font-size:12px;color:var(--text3);font-weight:400">'+mt.length+'项·完成'+dc+'</span></div>';
+    mt.forEach(function(t){h+=tHTML(t)});
+  });
+  document.getElementById('sec-list').innerHTML=h||'<div style="text-align:center;padding:60px;color:var(--text3)">🔍 没有匹配的任务</div>';
+}
+
+// ===== 看板视图 =====
+function renderKanban(){
+  var f=getFiltered(),cols=[{k:'todo',l:'📋 待启动',c:'var(--todo)'},{k:'doing',l:'🔧 进行中',c:'var(--doing)'},{k:'done',l:'✅ 已完成',c:'var(--done)'}];
+  var h='<div class="kanban">';
+  cols.forEach(function(c){
+    var ct=f.filter(function(t){return t.status===c.k});
+    h+='<div class="kcol"><div class="kcol-h" style="border-bottom-color:'+c.c+'"><span>'+c.l+'</span><span class="kc">'+ct.length+'</span></div><div class="kcol-b">';
+    ct.forEach(function(t){
+      h+='<div class="kcard '+oCls(t.owner)+'" onclick="openDt('+t.id+')"><div class="kcard-t">'+t.name+'</div><div class="kcard-m"><span class="tg '+oTag(t.owner)+'">'+t.owner+'</span><span class="tg tg-dept">'+MN[t.month].replace(/[📖🔥📋🎓🏆📦🔄]\s?/,'')+'</span>'+(t.priority==='high'?'<span class="tg-p p-high">🔴高</span>':'')+'</div></div>';
+    });
+    h+='</div></div>';
+  });
+  document.getElementById('sec-kanban').innerHTML=h+'</div>';
+}
+
+// ===== 按负责人视图 =====
+function renderPerson(){
+  var f=getFiltered(),ps=[{n:'王老师',c:'pw',i:'🔵'},{n:'董老师',c:'pd',i:'🟢'},{n:'李老师',c:'pl',i:'🟠'},{n:'副院长',c:'pp',i:'🟣'}],h='';
+  ps.forEach(function(p){
+    var pt=f.filter(function(t){return t.owner===p.n});
+    if(!pt.length)return;
+    var dc=pt.filter(function(t){return t.status==='done'}).length;
+    var pct=pt.length?Math.round(dc/pt.length*100):0;
+    h+='<div class="pcol"><div class="pcol-h '+p.c+'"><span>'+p.i+' '+p.n+' （'+pt.length+'项）</span><span>完成 '+dc+'/'+pt.length+' ('+pct+'%)</span></div><div class="pcol-b">';
+    pt.forEach(function(t){h+=tHTML(t)});
+    h+='</div></div>';
+  });
+  document.getElementById('sec-person').innerHTML=h||'<div style="text-align:center;padding:60px;color:var(--text3)">没有匹配的任务</div>';
+}
+
+function render(){renderStats();renderList();renderKanban();renderPerson();}
+
+// ===== Tab/筛选 =====
+function switchTab(tab,el){
+  curTab=tab;
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')});
+  el.classList.add('active');
+  document.querySelectorAll('.section').forEach(function(s){s.classList.remove('active')});
+  document.getElementById('sec-'+tab).classList.add('active');
+}
+function setOwner(o,el){
+  curOwner=o;
+  document.querySelectorAll('.fbtn').forEach(function(b){b.classList.remove('active')});
+  el.classList.add('active');render();
+}
+
+// ===== 状态 =====
+function togS(id){
+  var t=tasks.find(function(x){return x.id===id});if(!t)return;
+  t.status=t.status==='done'?'todo':'done';
+  save();render();toast(t.status==='done'?'✅ 完成':'↩️ 恢复');
+}
+function cycS(id){
+  var t=tasks.find(function(x){return x.id===id});if(!t)return;
+  var o=['todo','doing','done'],i=o.indexOf(t.status);
+  t.status=o[(i+1)%3];save();render();toast('状态: '+SN[t.status]);
+}
+
+// ===== 新增/编辑弹窗 =====
+function openAdd(){
+  document.getElementById('eId').value='';
+  document.getElementById('eName').value='';
+  document.getElementById('eOwner').value='王老师';
+  document.getElementById('eMonth').value='3';
+  document.getElementById('ePriority').value='medium';
+  document.getElementById('eStatus').value='todo';
+  document.getElementById('eDeadline').value='';
+  document.getElementById('eDept').value='';
+  document.getElementById('eNote').value='';
+  document.getElementById('editTitle').textContent='新增任务';
+  document.getElementById('delBtn').style.display='none';
+  document.getElementById('editModal').classList.add('show');
+  isModalOpen=true;
+}
+function openEdit(id){
+  var t=tasks.find(function(x){return x.id===id});if(!t)return;
+  document.getElementById('eId').value=t.id;
+  document.getElementById('eName').value=t.name;
+  document.getElementById('eOwner').value=t.owner;
+  document.getElementById('eMonth').value=t.month;
+  document.getElementById('ePriority').value=t.priority;
+  document.getElementById('eStatus').value=t.status;
+  document.getElementById('eDeadline').value=t.deadline||'';
+  document.getElementById('eDept').value=t.dept||'';
+  document.getElementById('eNote').value=t.note||'';
+  document.getElementById('editTitle').textContent='编辑任务';
+  document.getElementById('delBtn').style.display='inline-block';
+  document.getElementById('editModal').classList.add('show');
+  isModalOpen=true;
+}
+function closeEdit(){document.getElementById('editModal').classList.remove('show');isModalOpen=false;render();}
+
+function saveTask(){
+  var name=document.getElementById('eName').value.trim();
+  if(!name){alert('请输入任务名称');return;}
+  var idVal=document.getElementById('eId').value;
+  var data={name:name,owner:document.getElementById('eOwner').value,month:document.getElementById('eMonth').value,
+    priority:document.getElementById('ePriority').value,status:document.getElementById('eStatus').value,
+    deadline:document.getElementById('eDeadline').value,dept:document.getElementById('eDept').value.trim(),
+    note:document.getElementById('eNote').value.trim()};
+  if(idVal){
+    var t=tasks.find(function(x){return x.id===parseInt(idVal)});
+    if(t)Object.assign(t,data);
+  }else{data.id=nextId++;data.notes=[];tasks.push(data);}
+  save();closeEdit();toast(idVal?'✅ 已更新':'✅ 已添加');
+}
+function delTask(){
+  var idVal=parseInt(document.getElementById('eId').value);
+  if(!confirm('确定删除？'))return;
+  tasks=tasks.filter(function(t){return t.id!==idVal});
+  save();closeEdit();toast('🗑️ 已删除');
+}
+
+// ===== 详情弹窗 =====
+function openDt(id){
+  var t=tasks.find(function(x){return x.id===id});if(!t)return;
+  dtId=id;isModalOpen=true;
+  document.getElementById('dtTitle').textContent=t.name;
+  var h='<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px">'+
+    '<span class="tg '+oTag(t.owner)+'">'+t.owner+'</span>'+
+    '<span class="tg-s '+sCls(t.status)+'">'+SN[t.status]+'</span>'+
+    '<span class="tg tg-dept">'+MN[t.month].replace(/[📖🔥📋🎓🏆📦🔄]\s?/,'')+'</span>'+
+    '<span class="tg-p '+(t.priority==='high'?'p-high':'')+'">'+PN[t.priority]+'</span></div>';
+  if(t.dept)h+='<div style="font-size:13px;margin-bottom:6px"><b>对接单位：</b>'+t.dept+'</div>';
+  if(t.deadline)h+='<div style="font-size:13px;margin-bottom:6px"><b>截止：</b>'+t.deadline+dWarn(t.deadline,t.status)+'</div>';
+  if(t.note)h+='<div style="font-size:13px;margin-bottom:6px"><b>备注：</b>'+t.note+'</div>';
+  document.getElementById('dtBody').innerHTML=h;
+  rNotes(t);
+  document.getElementById('detailModal').classList.add('show');
+}
+function closeDt(){document.getElementById('detailModal').classList.remove('show');isModalOpen=false;dtId=null;render();}
+function editFromDt(){var id=dtId;closeDt();if(id)openEdit(id);}
+
+// ===== 跟进记录 =====
+function rNotes(t){
+  var h='';
+  if(t.notes&&t.notes.length){
+    t.notes.forEach(function(n,i){
+      h+='<div class="note-item"><div>'+n.text+'</div><div class="nd">'+n.date+(n.user?' · '+n.user:'')+' <span style="cursor:pointer" onclick="dNote('+t.id+','+i+')">✕</span></div></div>';
+    });
+  }else h='<div style="font-size:12px;color:var(--text3);padding:8px">暂无记录</div>';
+  document.getElementById('dtNotes').innerHTML=h;
+}
+function addNote(){
+  var t=tasks.find(function(x){return x.id===dtId});if(!t)return;
+  var inp=document.getElementById('noteIn'),text=inp.value.trim();if(!text)return;
+  if(!t.notes)t.notes=[];
+  var now=new Date();
+  var ds=now.getFullYear()+'-'+(now.getMonth()+1)+'-'+now.getDate()+' '+now.getHours()+':'+String(now.getMinutes()).replace(/^(\d)$/,'0$1');
+  t.notes.push({text:text,date:ds,user:currentUser});
+  inp.value='';save();rNotes(t);toast('📝 已添加');
+}
+function dNote(tid,idx){
+  var t=tasks.find(function(x){return x.id===tid});
+  if(!t||!t.notes)return;t.notes.splice(idx,1);save();rNotes(t);
+}
+
+// ===== 导出/导入/重置 =====
+function exportJSON(){
+  var blob=new Blob([JSON.stringify(tasks,null,2)],{type:'application/json'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='tasks_'+new Date().toISOString().slice(0,10)+'.json';a.click();toast('📤 已导出');
+}
+function importJSON(e){
+  var file=e.target.files[0];if(!file)return;
+  var r=new FileReader();
+  r.onload=function(ev){
+    try{tasks=JSON.parse(ev.target.result);nextId=Math.max.apply(null,tasks.map(function(t){return t.id}))+1;save();render();toast('📥 导入成功');}
+    catch(err){alert('文件格式错误');}
+  };r.readAsText(file);e.target.value='';
+}
+function resetAll(){
+  if(!confirm('确定重置为初始数据？所有修改将丢失！'))return;
+  tasks=clone(TASKS);save();render();toast('🔄 已重置');
+}
+</script>
+</body>
+</html>
