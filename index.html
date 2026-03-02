@@ -125,10 +125,10 @@ button{font-family:inherit}
 <div style="font-size:48px;margin-bottom:8px">📋</div>
 <h2 style="margin-bottom:4px">网安学院 · 工作追踪</h2>
 <p style="color:#888;font-size:13px;margin-bottom:20px">26春季学期 · 请选择身份</p>
-<button class="login-btn" onclick="selRole(this,'李超')">🟣 超</button>
-<button class="login-btn" onclick="selRole(this,'王德芳')">🔵 芳</button>
-<button class="login-btn" onclick="selRole(this,'李巍巍')">🟠 巍</button>
-<button class="login-btn" onclick="selRole(this,'董晓娜')">🟢 娜</button>
+<button class="login-btn" onclick="selRole(this,'李超')">🟣 李超</button>
+<button class="login-btn" onclick="selRole(this,'王德芳')">🔵 王德芳</button>
+<button class="login-btn" onclick="selRole(this,'李巍巍')">🟠 李巍巍</button>
+<button class="login-btn" onclick="selRole(this,'董晓娜')">🟢 董晓娜</button>
 <div style="margin-top:16px">
 <input type="password" id="pinInput" placeholder="输入访问密码" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:14px;text-align:center" onkeydown="if(event.key==='Enter')doLogin()">
 </div>
@@ -150,12 +150,12 @@ button{font-family:inherit}
 <button class="hbtn" onclick="exportJSON()">📤 导出</button>
 <button class="hbtn" onclick="document.getElementById('imp').click()">📥 导入</button>
 <input type="file" id="imp" accept=".json" style="display:none" onchange="importJSON(event)">
-<button class="hbtn" onclick="resetAll()">🔄 重置</button>
+<!-- <button class="hbtn" onclick="resetAll()">🔄 重置</button> -->
 <button class="hbtn" onclick="logout()">🚪</button>
 </div>
 </div>
 <div class="stats" id="statsBar"></div>
-<div class="tabs">
+<div class="tabs">  
 <div class="tab active" onclick="switchTab('list',this)">📋 按月查看</div>
 <div class="tab" onclick="switchTab('kanban',this)">📊 状态看板</div>
 <div class="tab" onclick="switchTab('person',this)">👥 按负责人</div>
@@ -239,7 +239,7 @@ var firebaseConfig = {
 };
 
 // ⚠️ 第2处可改：访问密码（告诉四个人即可）
-var ACCESS_PIN = "waxyrcb";
+var ACCESS_PIN = "test";
 
 // ===== 91项预设任务 =====
 var TASKS=[
